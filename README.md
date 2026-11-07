@@ -1,5 +1,7 @@
 # LessonForge: AI lesson creation with two independent QC layers
 
+**▶ Demo video:** [Watch on Google Drive](https://drive.google.com/file/d/1dToN6mjShkUByGHek_5U-NRvJUUIf8In/view?usp=drivesdk)
+
 LessonForge turns a **lesson title + learning objective** into a researched, cited **45-minute lesson**.
 It then audits the lesson with **two independent quality-control layers** and lets the instructor review,
 edit, apply fixes, version and export the result.
@@ -39,7 +41,7 @@ flowchart LR
 **Requirements:** Python 3.10+ (tick "Add Python to PATH" when installing) and at least one free API key:
 Gemini (https://aistudio.google.com/apikey) and/or Groq (https://console.groq.com/keys). Having both is best.
 
-1. Unzip, open the `lessonforge` folder (the one containing `app`, `static`, `setup.bat`).
+1. Download the code (green **Code** button → **Download ZIP**, or `git clone https://github.com/NanditaPatni/lessonforge.git`) and open the `lessonforge` folder (the one containing `app`, `static`, `setup.bat`).
 2. Double-click **`setup.bat`**. It creates a virtual environment, installs packages, asks for your keys,
    **tests which models work right now**, writes `.env`, and opens http://localhost:8000.
 3. Next time just double-click **`run.bat`**. If a model starts failing later (providers retire or overload
@@ -60,7 +62,7 @@ python -m uvicorn app.main:app --port 8000
 Free-tier models fail in three ways: a retired model name returns 404, an overloaded model returns 503, and a
 small per-minute token limit returns 413 or cuts off the output. The doctor does not hard-code a model. It lists what
 your keys can access, sends each candidate a tiny JSON request, and writes an ordered chain:
-* the fastest working model (Gemini preferred, because of its large limits) becomes the **generator**
+* the best working model (ranked by a fixed quality order, not by speed) becomes the **generator**
 * a model from the **other provider** becomes the **QC reviewer** (independent review)
 * the rest become `FALLBACK_LLM`. If a call fails, the same request is retried down the chain, and the first
   model that works is reused for the rest of that step.
@@ -73,16 +75,18 @@ Every request stays small enough for free-tier limits.
 | Purpose | Provider | Where |
 |---|---|---|
 | Generator LLM (recommended) | Google Gemini | https://aistudio.google.com/apikey |
-| Independent QC reviewer (recommended) | Groq (Llama 3.3 70B) | https://console.groq.com/keys |
+| Independent QC reviewer (recommended) | Groq (e.g. `openai/gpt-oss-120b`) | https://console.groq.com/keys |
 | Better web search (optional) | Tavily | https://app.tavily.com |
 | Accurate YouTube metadata (optional) | YouTube Data API v3 | Google Cloud Console → enable "YouTube Data API v3" → create API key |
 
 Without Tavily or YouTube keys, research uses DuckDuckGo search, which needs no key. Books use Google Books and Open Library, which also need no key.
 
-To run QC on a **different model** (stronger independence), add both keys and set:
+To run QC on a **different model** (stronger independence), add both keys and set one provider to write and the other to review, for example:
 ```
-LLM_PROVIDER=gemini
-QC_LLM_PROVIDER=groq
+LLM_PROVIDER=groq
+LLM_MODEL=openai/gpt-oss-120b
+QC_LLM_PROVIDER=gemini
+QC_LLM_MODEL=gemini-flash-lite-latest
 ```
 
 Provider model names change over time. If you get a "model not found" error, set `LLM_MODEL` / `QC_LLM_MODEL` in `.env` to a current model.
@@ -128,12 +132,14 @@ This mode uses a deterministic mock model and fixture sources. It is useful for 
 ## Tests
 
 ```bash
-pytest -q
+pytest -q          # 173 tests, no API keys or internet needed
 ```
 - `tests/test_pipeline.py`: full pipeline through the API, empty-input validation, versioning and edit conflicts, applying QC fixes, retrying a failed step, removal of hallucinated citations, BM25, credibility tiers.
 - `tests/test_chaos.py`: 120 runs with a fake model that randomly returns malformed-but-parseable JSON (bare lists,
   wrapper objects, renamed keys, options as dicts, scores as strings). Every step must still finish and every QC fix
   must apply without crashing.
+- `tests/test_requirements.py`: one test per requirement in the brief (see `docs/REQUIREMENTS.md`).
+- `tests/test_research_fallbacks.py`: research still finds web pages, books and videos when the planned searches are too narrow or fail.
 - `tests/test_live_path.py`: runs the **live** code path (Gemini adapter, research collector, link checks, second-opinion re-search) with the network faked. It plants a factual error ("GET is not idempotent") and asserts that QC1 flags it as critical, that the independent search confirms it, and that the exact-text fix corrects it.
 
 ## Project structure
