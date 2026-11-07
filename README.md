@@ -1,3 +1,5 @@
+**Demo video:** YOUR_VIDEO_LINK
+
 # LessonForge: AI lesson creation with two independent QC layers
 
 LessonForge turns a **lesson title + learning objective** into a researched, cited **45-minute lesson**.
