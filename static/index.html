@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LessonForge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="taskbar">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>LessonForge</div>
+  <div id="health" class="health"></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <section class="win">
+      <div class="win-title t-orange"><span>New lesson</span><span class="win-btns" aria-hidden="true"><i class="wb-min"></i><i class="wb-close"></i></span></div>
+      <form id="createForm" class="win-body" novalidate>
+        <label>Lesson title
+          <input id="fTitle" maxlength="150">
+        </label>
+        <label>Learning objective
+          <textarea id="fObjective" rows="4" maxlength="600" placeholder="What should learners be able to do after this lesson?"></textarea>
+        </label>
+        <div id="formError" class="error-text"></div>
+        <button type="submit" class="btn primary block" id="createBtn">Generate lesson</button>
+        <div class="samples">
+          <span class="muted small">Samples</span>
+          <button type="button" class="btn small" data-sample="http">HTTP</button>
+          <button type="button" class="btn small" data-sample="sql">SQL Joins</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="win">
+      <div class="win-title t-violet"><span>Lessons</span><span class="win-btns" aria-hidden="true"><i class="wb-min"></i><i class="wb-close"></i></span></div>
+      <div class="win-body">
+        <div id="lessonList" class="lesson-list"><div class="muted small">No lessons yet.</div></div>
+      </div>
+    </section>
+  </aside>
+
+  <main id="main">
+    <section class="win">
+      <div class="win-title t-purple"><span>Welcome</span><span class="win-btns" aria-hidden="true"><i class="wb-min"></i><i class="wb-max"></i><i class="wb-close"></i></span></div>
+      <div class="win-body empty">
+        <h2>Create a well-researched 45-minute lesson</h2>
+        <p class="muted">LessonForge researches the web, books and YouTube, writes an evidence-cited lesson, and checks it
+          with two independent quality-control layers that you review before exporting.</p>
+        <h4 style="margin-top:1.2rem">How to use it</h4>
+        <ol class="howto">
+          <li>Type a <b>title</b> and <b>learning objective</b> on the left (or click a sample), then <b>Generate lesson</b>.</li>
+          <li>Wait a few minutes while it researches, writes and checks the lesson.</li>
+          <li>Follow the numbered steps at the top: <b>1 Sources › 2 Lesson › 3 Fact check › 4 Teaching check › 5 Export</b>.
+            The <b>Next →</b> button at the bottom of each page takes you to the next one.</li>
+        </ol>
+        <p class="muted small">On the check pages, each suggestion has its own <b>Apply</b> and <b>Dismiss</b> button.
+          Every change is saved as a new version, so nothing is lost (see <b>History</b>).</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
